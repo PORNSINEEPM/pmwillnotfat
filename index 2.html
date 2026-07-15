@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Uni Life Hub</title>
+<style>
+  :root {
+    --burgundy: #3A2620;
+    --blue: #C7DCE8;
+    --blueDeep: #9FC1D3;
+    --butter: #F6ECA0;
+    --butterDeep: #EEDF78;
+    --cream: #FBF6E3;
+    --danger: #e8b4a8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Sarabun', 'Noto Sans Thai', -apple-system, system-ui, sans-serif;
+    background: var(--butter);
+    color: var(--burgundy);
+    min-height: 100vh;
+  }
+  .serif { font-family: Georgia, 'Noto Serif Thai', serif; }
+  .center-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .wrap { width: 100%; max-width: 420px; margin: 0 auto; }
+  .card { background: var(--cream); border: 1px solid rgba(159,193,211,0.3); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
+  .swatch { border-radius: 22px; padding: 20px 22px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px; }
+  .swatch.dark { background: var(--burgundy); color: var(--butter); }
+  .swatch.blue { background: var(--blue); color: var(--burgundy); }
+  .swatch .icon-box { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .swatch h2 { margin: 0; font-size: 20px; font-style: italic; }
+  .swatch p { margin: 3px 0 0; font-size: 13px; opacity: 0.8; }
+  h1.title { font-size: 40px; margin: 4px 0; font-style: italic; text-align: center; }
+  .eyebrow { text-align: center; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.85; }
+  .subtitle { text-align: center; font-size: 14px; opacity: 0.7; margin-bottom: 24px; }
+  input, button, select { font-family: inherit; font-size: 14px; }
+  input[type=text], input[type=number], input[type=date] {
+    padding: 9px 12px; border-radius: 12px; border: 1px solid rgba(58,38,32,0.25); color: var(--burgundy); background: #fff; width: 100%;
+  }
+  button { cursor: pointer; border: none; border-radius: 12px; }
+  .btn-primary { background: var(--burgundy); color: var(--butter); padding: 10px 16px; font-weight: 600; }
+  .btn-soft { background: var(--butter); color: var(--burgundy); padding: 10px 16px; font-weight: 600; }
+  .btn-blue { background: var(--blue); color: var(--burgundy); padding: 10px 16px; font-weight: 600; }
+  .row { display: flex; gap: 8px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .label { font-size: 12px; opacity: 0.65; display: block; margin-bottom: 4px; }
+  .profile-btn { width: 100%; text-align: left; padding: 12px 16px; border-radius: 14px; background: var(--blue); color: var(--burgundy); display: flex; align-items: center; justify-content: space-between; font-weight: 600; margin-bottom: 8px; }
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.75; margin-bottom: 10px; }
+  .topbar { position: sticky; top: 0; background: var(--butter); padding: 14px 16px 6px; z-index: 10; }
+  .topbar-inner { max-width: 640px; margin: 0 auto; }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
+  .tab-btn { flex-shrink: 0; padding: 9px 14px; border-radius: 999px; font-weight: 600; background: var(--cream); color: var(--burgundy); white-space: nowrap; }
+  .tab-btn.active { background: var(--burgundy); color: var(--butter); }
+  .content { max-width: 640px; margin: 0 auto; padding: 8px 16px 60px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; }
+  .cal-cell.today { background: var(--burgundy); color: var(--butter); font-weight: 700; }
+  .cal-head { font-size: 12px; font-weight: 700; opacity: 0.55; padding: 4px 0; }
+  .clock-time { font-size: 30px; font-family: Georgia, serif; margin: 0; }
+  .clock-date { font-size: 13px; opacity: 0.7; margin: 6px 0 0; display: flex; align-items: center; gap: 6px; }
+  .cat-box { border-radius: 14px; padding: 12px; }
+  .cat-title { font-size: 14px; font-weight: 600; margin: 0 0 8px; display: flex; align-items: center; gap: 6px; }
+  .entry-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding: 8px 10px; border-radius: 10px; background: var(--cream); margin-bottom: 6px; }
+  .todo-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; background: var(--cream); margin-bottom: 8px; }
+  .todo-row.done { background: rgba(199,220,232,0.4); }
+  .checkbox { width: 20px; height: 20px; border-radius: 999px; border: 1.5px solid var(--burgundy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .checkbox.checked { background: var(--burgundy); color: var(--butter); }
+  .icon-btn { background: none; border: none; cursor: pointer; padding: 4px; color: #a04a3a; }
+  .challenge-box { border-radius: 18px; padding: 30px 16px; background: var(--burgundy); color: var(--butter); text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 17px; font-style: italic; font-family: Georgia, serif; }
+  .challenge-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; background: var(--cream); font-size: 13px; margin-bottom: 6px; }
+  .laundry-box { border-radius: 18px; padding: 40px 16px; text-align: center; background: var(--blue); }
+  .laundry-box.overdue { background: var(--danger); }
+  .laundry-box .num { font-size: 26px; font-family: Georgia, serif; margin: 8px 0 0; }
+  .banner { background: var(--danger); border-radius: 14px; padding: 10px 14px; font-size: 12px; margin-bottom: 10px; }
+  .banner b { display: block; margin-bottom: 2px; }
+  .error-text { color: #a03a2a; font-size: 12px; margin-top: 6px; }
+  .hint { font-size: 12px; opacity: 0.65; margin-bottom: 10px; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  .sum-row { display: flex; justify-content: space-between; font-size: 13px; }
+  .save-indicator { font-size: 12px; opacity: 0.6; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbox { max-height: 260px; overflow-y: auto; padding-right: 4px; }
+  .lang-pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+  .lang-pill { flex-shrink: 0; padding: 7px 13px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--cream); color: var(--burgundy); white-space: nowrap; }
+  .lang-pill.active { background: var(--burgundy); color: var(--butter); }
+  .hide-toggles { display: flex; gap: 14px; margin-bottom: 12px; }
+  .hide-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; user-select: none; }
+  .hide-toggle input { width: 15px; height: 15px; accent-color: var(--burgundy); }
+  .word-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; padding: 9px 10px; border-radius: 10px; background: var(--cream); margin-bottom: 6px; }
+  .word-cell { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .word-cell.blurred { color: transparent; background: rgba(58,38,32,0.12); border-radius: 6px; user-select: none; }
+  .stars { display: flex; gap: 2px; }
+  .star { font-size: 18px; cursor: pointer; line-height: 1; opacity: 0.35; }
+  .star.filled { opacity: 1; }
+  .movie-card { border-radius: 14px; padding: 12px 14px; background: var(--cream); margin-bottom: 10px; }
+  .movie-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .movie-title { font-weight: 700; font-size: 14px; margin: 0; }
+  .movie-type { font-size: 11px; opacity: 0.6; }
+  .movie-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 8px; flex-wrap: wrap; }
+  .finished-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--blue); color: var(--burgundy); }
+  .finished-badge.done { background: var(--burgundy); color: var(--butter); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============================================================
+   STORAGE — plain localStorage, works fully offline & forever
+   on this device/browser. No Claude, no publishing needed.
+============================================================ */
+const LS_PROFILES = "ulh_profiles";
+const profileKey = (name) => "ulh_profile_" + name;
+
+function getProfiles() {
+  try { return JSON.parse(localStorage.getItem(LS_PROFILES) || "[]"); }
+  catch { return []; }
+}
+function saveProfilesList(list) {
+  localStorage.setItem(LS_PROFILES, JSON.stringify(list));
+}
+function loadProfileData(name) {
+  try {
+    const raw = localStorage.getItem(profileKey(name));
+    return raw ? JSON.parse(raw) : defaultData();
+  } catch { return defaultData(); }
+}
+function saveProfileData(name, data) {
+  localStorage.setItem(profileKey(name), JSON.stringify(data));
+}
+function defaultData() {
+  return {
+    salary: 0, savings: 0, periodDays: 30,
+    entries: [], todos: [],
+    challenges: [
+      "ไม่ขี่ Grab/วิน กลับหอ เดินแทน","ไม่สั่งฟู้ดดิลิเวอรี่วันนี้","เดินให้ครบ 10,000 ก้าว",
+      "ไม่กินน้ำหวาน/ชานมทั้งวัน","พกขวดน้ำไปเอง ไม่ซื้อน้ำขวด","ไปเข้าเรียนก่อนเวลา 10 นาที",
+      "อ่านหนังสือ 20 นาทีก่อนนอน","ทำการบ้านให้เสร็จก่อน 3 ทุ่ม","งดเล่นมือถือ 1 ชม.ก่อนนอน",
+      "จดบันทึกรายจ่ายทุกบาทวันนี้","กินข้าวโรงอาหารแทนร้านนอกรั้ว","ตื่นก่อน 7 โมงเช้า",
+      "ทำความสะอาดห้อง/โต๊ะเรียน","ไม่ซื้อของที่ไม่จำเป็นวันนี้","ชวนเพื่อนออกกำลังกาย 15 นาที",
+    ],
+    lastChallenge: null,
+    laundryDate: "",
+    vocabLangs: [ { id: "lang_en", name: "อังกฤษ" } ],
+    vocabWords: [],
+    movies: [],
+  };
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const sanitizeKey = (s) => (s || "").trim().replace(/[\s/\\'"]+/g, "_").slice(0, 60);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const thb = (n) => (Number(n) || 0).toLocaleString("th-TH", { maximumFractionDigits: 2 });
+function todayKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+const CATS = {
+  food:      { label: "ค่ากิน",  emoji: "🍜", bg: "var(--blue)" },
+  transport: { label: "ค่ารถ",   emoji: "🚌", bg: "var(--butter)" },
+  shopping:  { label: "ซื้อของ", emoji: "🛍️", bg: "var(--blueDeep)" },
+  other:     { label: "อื่นๆ",   emoji: "✳️", bg: "var(--butterDeep)" },
+};
+const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const DAYS = ["อา","จ","อ","พ","พฤ","ศ","ส"];
+
+/* ============================================================
+   STATE
+============================================================ */
+let state = {
+  profile: null,
+  data: null,
+  tab: "calendar",
+  calViewDate: new Date(),
+  vocabActiveLang: null,
+  vocabHideWord: false,
+  vocabHideTranslation: false,
+};
+
+/* ============================================================
+   RENDER ROOT
+============================================================ */
+function render() {
+  const app = document.getElementById("app");
+  if (!state.profile) {
+    app.innerHTML = renderGate();
+    bindGateEvents();
+  } else {
+    app.innerHTML = renderMainApp();
+    bindMainEvents();
+  }
+}
+
+/* ============================================================
+   PROFILE GATE
+============================================================ */
+let gateError = "";
+
+function renderGate() {
+  const profiles = getProfiles();
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      <p class="eyebrow">Uni Life</p>
+      <h1 class="title">Hub</h1>
+      <p class="subtitle">เลือกโปรไฟล์ของตัวเอง หรือสร้างใหม่ — เซฟถาวรในเครื่องนี้จริง ไม่ต้องพึ่งอินเทอร์เน็ต</p>
+
+      <div class="card">
+        <div class="section-title">โปรไฟล์ของฉัน</div>
+        ${profiles.length === 0
+          ? `<p class="hint">ยังไม่มีโปรไฟล์ สร้างอันแรกด้านล่างได้เลย</p>`
+          : profiles.map(p => `<button class="profile-btn" data-enter="${esc(p)}">👤 ${esc(p)} <span>›</span></button>`).join("")}
+      </div>
+
+      <div class="card">
+        <div class="section-title">สร้างโปรไฟล์ใหม่</div>
+        <div class="row">
+          <input type="text" id="newProfileName" placeholder="เช่น ปุ๊กกี้" />
+          <button class="btn-primary" id="createProfileBtn">＋ สร้าง</button>
+        </div>
+        ${gateError ? `<p class="error-text">${esc(gateError)}</p>` : ""}
+      </div>
+
+      <div class="card">
+        <div class="section-title">มีไฟล์สำรองข้อมูลไหม</div>
+        <p class="hint">ถ้าเคยดาวน์โหลดไฟล์สำรอง (.json) ไว้ นำเข้ากลับมาได้ที่นี่</p>
+        <input type="file" accept=".json" id="restoreFile" style="display:none" />
+        <button class="btn-soft" id="restoreBtn" style="width:100%">นำเข้าไฟล์สำรอง</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindGateEvents() {
+  document.querySelectorAll("[data-enter]").forEach(btn => {
+    btn.addEventListener("click", () => enterProfile(btn.dataset.enter));
+  });
+  document.getElementById("createProfileBtn").addEventListener("click", createProfile);
+  document.getElementById("newProfileName").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") createProfile();
+  });
+  document.getElementById("restoreBtn").addEventListener("click", () => {
+    document.getElementById("restoreFile").click();
+  });
+  document.getElementById("restoreFile").addEventListener("change", handleRestore);
+}
+
+function createProfile() {
+  const raw = document.getElementById("newProfileName").value;
+  const key = sanitizeKey(raw);
+  const profiles = getProfiles();
+  if (!key) { gateError = "ตั้งชื่อโปรไฟล์ก่อนนะ"; render(); return; }
+  if (profiles.includes(key)) { gateError = "ชื่อนี้มีอยู่แล้ว ลองชื่ออื่น"; render(); return; }
+  gateError = "";
+  profiles.push(key);
+  saveProfilesList(profiles);
+  saveProfileData(key, defaultData());
+  enterProfile(key);
+}
+
+function enterProfile(name) {
+  state.profile = name;
+  state.data = loadProfileData(name);
+  state.tab = "calendar";
+  state.vocabActiveLang = state.data.vocabLangs[0] ? state.data.vocabLangs[0].id : null;
+  state.vocabHideWord = false;
+  state.vocabHideTranslation = false;
+  render();
+  startClock();
+}
+
+function handleRestore(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed.profile || !parsed.data) throw new Error("bad");
+      const profiles = getProfiles();
+      if (!profiles.includes(parsed.profile)) {
+        profiles.push(parsed.profile);
+        saveProfilesList(profiles);
+      }
+      saveProfileData(parsed.profile, parsed.data);
+      enterProfile(parsed.profile);
+    } catch {
+      gateError = "ไฟล์สำรองไม่ถูกต้อง";
+      render();
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   MAIN APP SHELL
+============================================================ */
+const TABS = [
+  { key: "calendar",  label: "📅 ปฏิทิน" },
+  { key: "money",     label: "💰 การเงิน" },
+  { key: "todo",      label: "📝 To-do" },
+  { key: "vocab",     label: "🔤 ศัพท์" },
+  { key: "movies",    label: "🎬 หนัง" },
+  { key: "challenge", label: "✨ ชาเลนจ์" },
+  { key: "laundry",   label: "👕 ซักผ้า" },
+];
+
+function renderMainApp() {
+  return `
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin:0;">Uni Life Hub</p>
+            <p class="serif" style="font-size:18px;font-style:italic;margin:2px 0 0;">👤 ${esc(state.profile)}</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="save-indicator" id="saveIndicator"></span>
+            <button class="icon-btn" id="exportBtn" title="ดาวน์โหลดไฟล์สำรอง" style="background:var(--blue);border-radius:10px;padding:8px;color:var(--burgundy);">💾</button>
+            <button class="icon-btn" id="switchProfileBtn" title="สลับโปรไฟล์" style="background:var(--burgundy);border-radius:10px;padding:8px;color:var(--butter);">↩︎</button>
+          </div>
+        </div>
+        <div class="tabs">
+          ${TABS.map(t => `<button class="tab-btn ${state.tab === t.key ? "active" : ""}" data-tab="${t.key}">${t.label}</button>`).join("")}
+        </div>
+      </div>
+    </div>
+    <div class="content" id="tabContent">
+      ${renderTabContent()}
+    </div>
+  `;
+}
+
+function renderTabContent() {
+  switch (state.tab) {
+    case "calendar": return renderCalendar();
+    case "money": return renderMoney();
+    case "todo": return renderTodo();
+    case "vocab": return renderVocab();
+    case "movies": return renderMovies();
+    case "challenge": return renderChallenge();
+    case "laundry": return renderLaundry();
+    default: return "";
+  }
+}
+
+function bindMainEvents() {
+  document.getElementById("switchProfileBtn").addEventListener("click", () => {
+    state.profile = null; state.data = null;
+    render();
+  });
+  document.getElementById("exportBtn").addEventListener("click", exportBackup);
+  document.querySelectorAll("[data-tab]").forEach(btn => {
+    btn.addEventListener("click", () => { state.tab = btn.dataset.tab; render(); });
+  });
+  bindTabEvents();
+}
+
+function exportBackup() {
+  const payload = JSON.stringify({ profile: state.profile, data: state.data }, null, 2);
+  const blob = new Blob([payload], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `uni-life-hub-${state.profile}-${todayKey()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function persist() {
+  saveProfileData(state.profile, state.data);
+  const el = document.getElementById("saveIndicator");
+  if (el) {
+    el.textContent = "เซฟแล้ว ✓";
+    setTimeout(() => { if (el) el.textContent = ""; }, 1200);
+  }
+}
+
+function refreshContent() {
+  const el = document.getElementById("tabContent");
+  if (el) { el.innerHTML = renderTabContent(); bindTabEvents(); }
+}
+
+function bindTabEvents() {
+  if (state.tab === "calendar") bindCalendarEvents();
+  if (state.tab === "money") bindMoneyEvents();
+  if (state.tab === "todo") bindTodoEvents();
+  if (state.tab === "vocab") bindVocabEvents();
+  if (state.tab === "movies") bindMoviesEvents();
+  if (state.tab === "challenge") bindChallengeEvents();
+  if (state.tab === "laundry") bindLaundryEvents();
+}
+
+/* ============================================================
+   REAL-TIME CLOCK
+============================================================ */
+let clockTimer = null;
+function startClock() {
+  if (clockTimer) clearInterval(clockTimer);
+  clockTimer = setInterval(() => {
+    if (state.tab !== "calendar" || !state.profile) return;
+    const t = document.getElementById("liveTime");
+    const d = document.getElementById("liveDate");
+    if (t) t.textContent = new Date().toLocaleTimeString("th-TH", { hour12: false });
+    if (d) d.textContent = new Date().toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  }, 1000);
+}
+
+/* ============================================================
+   CALENDAR SECTION
+============================================================ */
+function renderCalendar() {
+  const now = new Date();
+  const view = state.calViewDate;
+  const year = view.getFullYear(), month = view.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let cells = "";
+  for (let i = 0; i < firstDay; i++) cells += `<div></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+    cells += `<div class="cal-cell ${isToday ? "today" : ""}">${d}</div>`;
+  }
+  return `
+    <div class="swatch dark"><div class="icon-box">📅</div><div><h2 class="serif">ปฏิทิน</h2><p>อัปเดตแบบเรียลไทม์</p></div></div>
+    <div class="card">
+      <p class="clock-time" id="liveTime">${now.toLocaleTimeString("th-TH", { hour12: false })}</p>
+      <p class="clock-date" id="liveDate">🕐 ${now.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <button class="btn-blue" id="prevMonth">‹</button>
+        <p class="serif" style="font-style:italic;font-size:17px;margin:0;">${MONTHS[month]} ${year + 543}</p>
+        <button class="btn-blue" id="nextMonth">›</button>
+      </div>
+      <div class="cal-grid" style="margin-bottom:6px;">${DAYS.map(d => `<div class="cal-head">${d}</div>`).join("")}</div>
+      <div class="cal-grid">${cells}</div>
+      <button class="btn-soft" id="todayBtn" style="margin-top:14px;font-size:12px;padding:7px 12px;">กลับไปเดือนนี้</button>
+    </div>
+  `;
+}
+function bindCalendarEvents() {
+  document.getElementById("prevMonth").addEventListener("click", () => {
+    const v = state.calViewDate; state.calViewDate = new Date(v.getFullYear(), v.getMonth() - 1, 1); refreshContent();
+  });
+  document.getElementById("nextMonth").addEventListener("click", () => {
+    const v = state.calViewDate; state.calViewDate = new Date(v.getFullYear(), v.getMonth() + 1, 1); refreshContent();
+  });
+  document.getElementById("todayBtn").addEventListener("click", () => {
+    state.calViewDate = new Date(); refreshContent();
+  });
+}
+
+/* ============================================================
+   MONEY SECTION
+============================================================ */
+function renderMoney() {
+  const d = state.data;
+  const today = todayKey();
+  const dailyBudget = d.periodDays > 0 ? (Number(d.salary) - Number(d.savings)) / Number(d.periodDays) : 0;
+  const todaysEntries = d.entries.filter(e => e.date === today);
+  const todaySpent = todaysEntries.reduce((s, e) => s + Number(e.amount), 0);
+  const todayLeft = dailyBudget - todaySpent;
+  const totalSpentAll = d.entries.reduce((s, e) => s + Number(e.amount), 0);
+  const totalLeftAll = (Number(d.salary) - Number(d.savings)) - totalSpentAll;
+
+  const byDate = {};
+  d.entries.forEach(e => { (byDate[e.date] = byDate[e.date] || []).push(e); });
+  const dateKeys = Object.keys(byDate).sort((a, b) => (a < b ? 1 : -1));
+
+  return `
+    <div class="swatch blue"><div class="icon-box">💰</div><div><h2 class="serif">เงินๆ ทองๆ</h2><p>เดือนนี้ใช้ไปเท่าไหร่แล้ว</p></div></div>
+
+    <div class="card">
+      <div class="section-title">ตั้งค่าเงินเดือน</div>
+      <div class="grid3">
+        <div><label class="label">เงินเดือน</label><input type="number" id="inpSalary" value="${d.salary || ""}"></div>
+        <div><label class="label">เงินเก็บ (หัก)</label><input type="number" id="inpSavings" value="${d.savings || ""}"></div>
+        <div><label class="label">จำนวนวัน</label><input type="number" id="inpDays" value="${d.periodDays || ""}"></div>
+      </div>
+      <div style="margin-top:14px;border-radius:14px;padding:14px;background:var(--butter);display:flex;align-items:center;justify-content:space-between;">
+        <div><p class="label" style="margin:0;">งบใช้ได้ต่อวัน</p><p class="serif" style="font-size:22px;margin:2px 0 0;">฿${thb(dailyBudget)}</p></div>
+        <span style="font-size:22px;">🪙</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">บันทึกรายจ่ายวันนี้</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${Object.entries(CATS).map(([key, meta]) => `
+          <div class="cat-box" style="background:${meta.bg}55;">
+            <p class="cat-title">${meta.emoji} ${meta.label}</p>
+            <div class="row">
+              <input type="number" placeholder="บาท" style="width:80px;flex-shrink:0;" id="amt_${key}">
+              <input type="text" placeholder="โน้ต (ไม่บังคับ)" id="note_${key}">
+              <button class="btn-primary" data-add-entry="${key}" style="flex-shrink:0;padding:9px 12px;">＋</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">สรุปวันนี้</div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div style="border-radius:12px;padding:12px;background:var(--blue);">
+          <p class="label" style="margin:0;">ใช้ไปวันนี้</p><p class="serif" style="font-size:19px;margin:2px 0 0;">฿${thb(todaySpent)}</p>
+        </div>
+        <div style="border-radius:12px;padding:12px;background:${todayLeft < 0 ? "var(--danger)" : "var(--butter)"};">
+          <p class="label" style="margin:0;">เหลือวันนี้</p><p class="serif" style="font-size:19px;margin:2px 0 0;">฿${thb(todayLeft)}</p>
+        </div>
+      </div>
+      ${todaysEntries.length === 0
+        ? `<p class="hint">ยังไม่มีรายการวันนี้</p>`
+        : todaysEntries.map(e => `
+          <div class="entry-row">
+            <span>${CATS[e.category].emoji} ${CATS[e.category].label}${e.note ? ` · ${esc(e.note)}` : ""}</span>
+            <span style="display:flex;gap:10px;align-items:center;">
+              <b>฿${thb(e.amount)}</b>
+              <button class="icon-btn" data-remove-entry="${e.id}">🗑️</button>
+            </span>
+          </div>
+        `).join("")}
+    </div>
+
+    <div class="card">
+      <div class="section-title">สรุปโดยรวม</div>
+      <div class="grid2" style="margin-bottom:14px;">
+        <div style="border-radius:12px;padding:12px;background:var(--burgundy);color:var(--butter);">
+          <p class="label" style="margin:0;color:rgba(246,236,160,0.8);">ใช้ไปทั้งหมด</p><p class="serif" style="font-size:19px;margin:2px 0 0;">฿${thb(totalSpentAll)}</p>
+        </div>
+        <div style="border-radius:12px;padding:12px;background:var(--burgundy);color:var(--butter);">
+          <p class="label" style="margin:0;color:rgba(246,236,160,0.8);">เหลือทั้งหมด</p><p class="serif" style="font-size:19px;margin:2px 0 0;">฿${thb(totalLeftAll)}</p>
+        </div>
+      </div>
+      <div class="scrollbox">
+        ${dateKeys.length === 0 ? `<p class="hint">ยังไม่มีข้อมูล</p>` : dateKeys.map(dk => {
+          const items = byDate[dk];
+          const sum = items.reduce((s, e) => s + Number(e.amount), 0);
+          return `
+          <details style="border-radius:10px;padding:8px 12px;background:var(--cream);margin-bottom:6px;">
+            <summary class="sum-row"><span>${dk}</span><b>฿${thb(sum)}</b></summary>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+              ${items.map(e => `<div class="sum-row" style="opacity:0.7;font-size:12px;"><span>${CATS[e.category].label}${e.note ? ` · ${esc(e.note)}` : ""}</span><span>฿${thb(e.amount)}</span></div>`).join("")}
+            </div>
+          </details>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+function bindMoneyEvents() {
+  ["inpSalary","inpSavings","inpDays"].forEach((id, i) => {
+    const field = ["salary","savings","periodDays"][i];
+    document.getElementById(id).addEventListener("input", (e) => {
+      state.data[field] = e.target.value; persist();
+    });
+  });
+  document.querySelectorAll("[data-add-entry]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.addEntry;
+      const amtEl = document.getElementById("amt_" + cat);
+      const noteEl = document.getElementById("note_" + cat);
+      const amt = Number(amtEl.value);
+      if (!amt || amt <= 0) return;
+      state.data.entries.unshift({ id: Date.now() + Math.random(), date: todayKey(), category: cat, amount: amt, note: noteEl.value.trim() });
+      persist(); refreshContent();
+    });
+  });
+  document.querySelectorAll("[data-remove-entry]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.removeEntry;
+      state.data.entries = state.data.entries.filter(e => String(e.id) !== id);
+      persist(); refreshContent();
+    });
+  });
+}
+
+/* ============================================================
+   TODO SECTION
+============================================================ */
+function renderTodo() {
+  const d = state.data;
+  const doneCount = d.todos.filter(t => t.done).length;
+  return `
+    <div class="swatch dark"><div class="icon-box">📝</div><div><h2 class="serif">To-do list</h2><p>ทำแล้ว ${doneCount}/${d.todos.length}</p></div></div>
+    <div class="card">
+      <div class="row">
+        <input type="text" id="newTodoText" placeholder="มีอะไรต้องทำ...">
+        <button class="btn-primary" id="addTodoBtn">＋</button>
+      </div>
+    </div>
+    <div class="card">
+      ${d.todos.length === 0 ? `<p class="hint">ไม่มีงานค้าง เย่!</p>` : d.todos.map(t => `
+        <div class="todo-row ${t.done ? "done" : ""}">
+          <div style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;min-width:0;" data-toggle-todo="${t.id}">
+            <span class="checkbox ${t.done ? "checked" : ""}">${t.done ? "✓" : ""}</span>
+            <span style="font-size:14px;${t.done ? "text-decoration:line-through;opacity:0.6;" : ""} overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.text)}</span>
+          </div>
+          <button class="icon-btn" data-remove-todo="${t.id}">🗑️</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+function bindTodoEvents() {
+  document.getElementById("addTodoBtn").addEventListener("click", addTodo);
+  document.getElementById("newTodoText").addEventListener("keydown", (e) => { if (e.key === "Enter") addTodo(); });
+  document.querySelectorAll("[data-toggle-todo]").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.toggleTodo;
+      const t = state.data.todos.find(x => String(x.id) === id);
+      if (t) t.done = !t.done;
+      persist(); refreshContent();
+    });
+  });
+  document.querySelectorAll("[data-remove-todo]").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.removeTodo;
+      state.data.todos = state.data.todos.filter(x => String(x.id) !== id);
+      persist(); refreshContent();
+    });
+  });
+}
+function addTodo() {
+  const input = document.getElementById("newTodoText");
+  const text = input.value.trim();
+  if (!text) return;
+  state.data.todos.unshift({ id: Date.now() + Math.random(), text, done: false });
+  persist(); refreshContent();
+}
+
+/* ============================================================
+   VOCAB SECTION
+============================================================ */
+function renderVocab() {
+  const d = state.data;
+  if (!state.vocabActiveLang && d.vocabLangs[0]) state.vocabActiveLang = d.vocabLangs[0].id;
+  const activeLang = d.vocabLangs.find(l => l.id === state.vocabActiveLang) || d.vocabLangs[0];
+  const words = activeLang ? d.vocabWords.filter(w => w.langId === activeLang.id) : [];
+
+  return `
+    <div class="swatch dark"><div class="icon-box">🔤</div><div><h2 class="serif">จดคำศัพท์</h2><p>เพิ่มภาษาและคำศัพท์ได้ไม่จำกัด</p></div></div>
+
+    <div class="card">
+      <div class="section-title">ภาษา</div>
+      <div class="lang-pills">
+        ${d.vocabLangs.map(l => `<button class="lang-pill ${activeLang && l.id === activeLang.id ? "active" : ""}" data-select-lang="${l.id}">${esc(l.name)}</button>`).join("")}
+      </div>
+      <div class="row">
+        <input type="text" id="newLangName" placeholder="เพิ่มภาษาใหม่ เช่น ญี่ปุ่น">
+        <button class="btn-primary" id="addLangBtn">＋ ภาษา</button>
+      </div>
+      ${d.vocabLangs.length > 1 && activeLang ? `<button class="icon-btn" id="removeLangBtn" style="margin-top:8px;font-size:12px;">🗑️ ลบภาษา "${esc(activeLang.name)}"</button>` : ""}
+    </div>
+
+    ${activeLang ? `
+    <div class="card">
+      <div class="section-title">เพิ่มคำศัพท์ (${esc(activeLang.name)})</div>
+      <div class="grid2" style="margin-bottom:10px;">
+        <div><label class="label">คำศัพท์</label><input type="text" id="newWordText" placeholder="เช่น apple"></div>
+        <div><label class="label">คำแปล</label><input type="text" id="newWordTranslation" placeholder="เช่น แอปเปิ้ล"></div>
+      </div>
+      <button class="btn-primary" id="addWordBtn" style="width:100%;">＋ เพิ่มคำ</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">รายการคำศัพท์ (${words.length})</div>
+      <div class="hide-toggles">
+        <label class="hide-toggle"><input type="checkbox" id="hideWordChk" ${state.vocabHideWord ? "checked" : ""}> ปิดคำศัพท์</label>
+        <label class="hide-toggle"><input type="checkbox" id="hideTranslationChk" ${state.vocabHideTranslation ? "checked" : ""}> ปิดคำแปล</label>
+      </div>
+      <div class="scrollbox">
+        ${words.length === 0 ? `<p class="hint">ยังไม่มีคำศัพท์ในภาษานี้</p>` : words.map(w => `
+          <div class="word-row">
+            <span class="word-cell ${state.vocabHideWord ? "blurred" : ""}">${esc(w.word)}</span>
+            <span class="word-cell ${state.vocabHideTranslation ? "blurred" : ""}">${esc(w.translation)}</span>
+            <button class="icon-btn" data-remove-word="${w.id}">🗑️</button>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+    ` : `<div class="card"><p class="hint">เพิ่มภาษาก่อนเพื่อเริ่มจดคำศัพท์</p></div>`}
+  `;
+}
+function bindVocabEvents() {
+  document.querySelectorAll("[data-select-lang]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.vocabActiveLang = btn.dataset.selectLang;
+      state.vocabHideWord = false;
+      state.vocabHideTranslation = false;
+      refreshContent();
+    });
+  });
+  document.getElementById("addLangBtn").addEventListener("click", addLang);
+  document.getElementById("newLangName").addEventListener("keydown", (e) => { if (e.key === "Enter") addLang(); });
+  const removeLangBtn = document.getElementById("removeLangBtn");
+  if (removeLangBtn) removeLangBtn.addEventListener("click", removeLang);
+  const addWordBtn = document.getElementById("addWordBtn");
+  if (addWordBtn) {
+    addWordBtn.addEventListener("click", addWord);
+    document.getElementById("newWordTranslation").addEventListener("keydown", (e) => { if (e.key === "Enter") addWord(); });
+    document.getElementById("newWordText").addEventListener("keydown", (e) => { if (e.key === "Enter") document.getElementById("newWordTranslation").focus(); });
+  }
+  const hideWordChk = document.getElementById("hideWordChk");
+  const hideTranslationChk = document.getElementById("hideTranslationChk");
+  if (hideWordChk) hideWordChk.addEventListener("change", (e) => { state.vocabHideWord = e.target.checked; refreshContent(); });
+  if (hideTranslationChk) hideTranslationChk.addEventListener("change", (e) => { state.vocabHideTranslation = e.target.checked; refreshContent(); });
+  document.querySelectorAll("[data-remove-word]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.removeWord;
+      state.data.vocabWords = state.data.vocabWords.filter(w => String(w.id) !== id);
+      persist(); refreshContent();
+    });
+  });
+}
+function addLang() {
+  const input = document.getElementById("newLangName");
+  const name = input.value.trim();
+  if (!name) return;
+  const id = "lang_" + Date.now() + Math.floor(Math.random() * 1000);
+  state.data.vocabLangs.push({ id, name });
+  state.vocabActiveLang = id;
+  state.vocabHideWord = false;
+  state.vocabHideTranslation = false;
+  persist(); refreshContent();
+}
+function removeLang() {
+  const d = state.data;
+  if (d.vocabLangs.length <= 1) return;
+  const id = state.vocabActiveLang;
+  d.vocabLangs = d.vocabLangs.filter(l => l.id !== id);
+  d.vocabWords = d.vocabWords.filter(w => w.langId !== id);
+  state.vocabActiveLang = d.vocabLangs[0] ? d.vocabLangs[0].id : null;
+  persist(); refreshContent();
+}
+function addWord() {
+  const wordEl = document.getElementById("newWordText");
+  const transEl = document.getElementById("newWordTranslation");
+  const word = wordEl.value.trim();
+  const translation = transEl.value.trim();
+  if (!word || !translation || !state.vocabActiveLang) return;
+  state.data.vocabWords.unshift({ id: Date.now() + Math.random(), langId: state.vocabActiveLang, word, translation });
+  persist(); refreshContent();
+}
+
+/* ============================================================
+   MOVIES SECTION
+============================================================ */
+function renderMovies() {
+  const d = state.data;
+  return `
+    <div class="swatch blue"><div class="icon-box">🎬</div><div><h2 class="serif">หนัง & ซีรี่ส์</h2><p>ดูอะไรอยู่บ้าง ถึงตอนไหนแล้ว</p></div></div>
+
+    <div class="card">
+      <div class="section-title">เพิ่มเรื่องใหม่</div>
+      <div style="margin-bottom:10px;"><label class="label">ชื่อเรื่อง</label><input type="text" id="newMovieTitle" placeholder="เช่น Stranger Things"></div>
+      <div class="grid2" style="margin-bottom:10px;">
+        <div>
+          <label class="label">ประเภท</label>
+          <select id="newMovieType" style="width:100%;padding:9px 12px;border-radius:12px;border:1px solid rgba(58,38,32,0.25);background:#fff;color:var(--burgundy);">
+            <option value="movie">หนัง</option>
+            <option value="series">ซีรี่ส์</option>
+          </select>
+        </div>
+        <div><label class="label">ตอนล่าสุดที่ดู</label><input type="text" id="newMovieEpisode" placeholder="เช่น S2 EP4"></div>
+      </div>
+      <button class="btn-primary" id="addMovieBtn" style="width:100%;">＋ เพิ่มเรื่อง</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">กำลังดู / ดูแล้ว (${d.movies.length})</div>
+      ${d.movies.length === 0 ? `<p class="hint">ยังไม่มีรายการ เพิ่มเรื่องแรกได้เลย</p>` : d.movies.map(m => `
+        <div class="movie-card">
+          <div class="movie-top">
+            <div style="min-width:0;">
+              <p class="movie-title">${esc(m.title)}</p>
+              <p class="movie-type">${m.type === "series" ? "📺 ซีรี่ส์" : "🎬 หนัง"}</p>
+            </div>
+            <button class="icon-btn" data-remove-movie="${m.id}">🗑️</button>
+          </div>
+          <div class="movie-meta">
+            <div class="stars" data-rate-movie="${m.id}">
+              ${[1,2,3,4,5].map(n => `<span class="star ${n <= m.rating ? "filled" : ""}" data-star="${n}">★</span>`).join("")}
+            </div>
+            <button class="finished-badge ${m.finished ? "done" : ""}" data-toggle-finished="${m.id}">${m.finished ? "✓ จบแล้ว" : "กำลังดู"}</button>
+          </div>
+          <div style="margin-top:8px;">
+            <label class="label">ตอนล่าสุด / สถานะ</label>
+            <input type="text" data-update-episode="${m.id}" value="${esc(m.lastEpisode || "")}" placeholder="เช่น S1 EP5">
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+function bindMoviesEvents() {
+  document.getElementById("addMovieBtn").addEventListener("click", addMovie);
+  document.getElementById("newMovieTitle").addEventListener("keydown", (e) => { if (e.key === "Enter") addMovie(); });
+  document.querySelectorAll("[data-remove-movie]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.removeMovie;
+      state.data.movies = state.data.movies.filter(m => String(m.id) !== id);
+      persist(); refreshContent();
+    });
+  });
+  document.querySelectorAll("[data-rate-movie]").forEach(container => {
+    const id = container.dataset.rateMovie;
+    container.querySelectorAll("[data-star]").forEach(star => {
+      star.addEventListener("click", () => {
+        const n = Number(star.dataset.star);
+        const m = state.data.movies.find(x => String(x.id) === id);
+        if (m) m.rating = (m.rating === n) ? 0 : n;
+        persist(); refreshContent();
+      });
+    });
+  });
+  document.querySelectorAll("[data-toggle-finished]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.toggleFinished;
+      const m = state.data.movies.find(x => String(x.id) === id);
+      if (m) m.finished = !m.finished;
+      persist(); refreshContent();
+    });
+  });
+  document.querySelectorAll("[data-update-episode]").forEach(input => {
+    input.addEventListener("change", (e) => {
+      const id = input.dataset.updateEpisode;
+      const m = state.data.movies.find(x => String(x.id) === id);
+      if (m) m.lastEpisode = e.target.value;
+      persist();
+    });
+  });
+}
+function addMovie() {
+  const titleEl = document.getElementById("newMovieTitle");
+  const typeEl = document.getElementById("newMovieType");
+  const epEl = document.getElementById("newMovieEpisode");
+  const title = titleEl.value.trim();
+  if (!title) return;
+  state.data.movies.unshift({
+    id: Date.now() + Math.random(),
+    title,
+    type: typeEl.value,
+    lastEpisode: epEl.value.trim(),
+    rating: 0,
+    finished: false,
+  });
+  persist(); refreshContent();
+}
+
+/* ============================================================
+   CHALLENGE SECTION
+============================================================ */
+let spinning = false;
+function renderChallenge() {
+  const d = state.data;
+  return `
+    <div class="swatch blue"><div class="icon-box">✨</div><div><h2 class="serif">สุ่มชาเลนจ์</h2><p>ท้าทายตัวเองแบบเด็กมหาลัย</p></div></div>
+    <div class="card" style="text-align:center;">
+      <div class="challenge-box" id="challengeBox">${esc(d.lastChallenge || "กดปุ่มเพื่อสุ่มชาเลนจ์!")}</div>
+      <button class="btn-soft" id="spinBtn" style="width:100%;padding:12px;">🔄 สุ่มเลย</button>
+    </div>
+    <div class="card">
+      <div class="section-title">รายการชาเลนจ์ (${d.challenges.length})</div>
+      <div class="row" style="margin-bottom:10px;">
+        <input type="text" id="newChallengeText" placeholder="เพิ่มชาเลนจ์ใหม่...">
+        <button class="btn-primary" id="addChallengeBtn">＋</button>
+      </div>
+      <div class="scrollbox">
+        ${d.challenges.map((c, i) => `
+          <div class="challenge-item">
+            <span>${esc(c)}</span>
+            <button class="icon-btn" data-remove-challenge="${i}">🗑️</button>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+function bindChallengeEvents() {
+  document.getElementById("spinBtn").addEventListener("click", spinChallenge);
+  document.getElementById("addChallengeBtn").addEventListener("click", addChallenge);
+  document.getElementById("newChallengeText").addEventListener("keydown", (e) => { if (e.key === "Enter") addChallenge(); });
+  document.querySelectorAll("[data-remove-challenge]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.removeChallenge);
+      state.data.challenges.splice(idx, 1);
+      persist(); refreshContent();
+    });
+  });
+}
+function addChallenge() {
+  const input = document.getElementById("newChallengeText");
+  const text = input.value.trim();
+  if (!text) return;
+  state.data.challenges.push(text);
+  persist(); refreshContent();
+}
+function spinChallenge() {
+  const d = state.data;
+  if (spinning || d.challenges.length === 0) return;
+  spinning = true;
+  const box = document.getElementById("challengeBox");
+  let i = 0;
+  const total = 14;
+  const interval = setInterval(() => {
+    const r = d.challenges[Math.floor(Math.random() * d.challenges.length)];
+    if (box) box.textContent = r;
+    i++;
+    if (i >= total) {
+      clearInterval(interval);
+      spinning = false;
+      d.lastChallenge = r;
+      persist();
+    }
+  }, 80);
+}
+
+/* ============================================================
+   LAUNDRY SECTION
+============================================================ */
+function renderLaundry() {
+  const d = state.data;
+  let box = "";
+  if (d.laundryDate) {
+    const target = new Date(d.laundryDate + "T00:00:00");
+    const diffDays = Math.ceil((target - new Date()) / (1000 * 60 * 60 * 24));
+    let text, overdue = false;
+    if (diffDays > 1) text = `อีก ${diffDays} วัน`;
+    else if (diffDays === 1) text = "พรุ่งนี้!";
+    else if (diffDays === 0) text = "วันนี้แหละ ซักผ้าได้เลย!";
+    else { text = `เลยมา ${Math.abs(diffDays)} วันแล้ว`; overdue = true; }
+    box = `<div class="card"><div class="laundry-box ${overdue ? "overdue" : ""}"><div style="font-size:30px;">👕</div><p class="serif num">${text}</p></div></div>`;
+  }
+  return `
+    <div class="swatch dark"><div class="icon-box">👕</div><div><h2 class="serif">นับถอยหลังวันซักผ้า</h2><p>อย่าปล่อยผ้ากองจนหมดตู้</p></div></div>
+    <div class="card">
+      <label class="label">วันที่จะไปซักผ้า</label>
+      <input type="date" id="laundryDateInput" value="${d.laundryDate || ""}">
+    </div>
+    ${box}
+  `;
+}
+function bindLaundryEvents() {
+  document.getElementById("laundryDateInput").addEventListener("change", (e) => {
+    state.data.laundryDate = e.target.value;
+    persist(); refreshContent();
+  });
+}
+
+/* ============================================================
+   BOOT
+============================================================ */
+render();
+</script>
+</body>
+</html>
